@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.millipede</groupId>
+    <artifactId>osgi-config-extension-feature</artifactId>
+    <version>1.0.0</version>
+
+    <packaging>feature</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+
+        <releases.repo.id>placeholder-releases.repo.id</releases.repo.id>
+        <releases.repo.url>placeholder-releases.repo.url</releases.repo.url>
+        <snapshots.repo.id>placeholder-snapshots.repo.id</snapshots.repo.id>
+        <snapshots.repo.url>placeholder-snapshots.repo.url</snapshots.repo.url>
+
+        <karaf-maven-plugin.version>4.3.0.RC1</karaf-maven-plugin.version>
+
+        <!-- Override version for maven-install-plugin due to a bug in the latest version (3.0.0-M1) preventing the
+        installation of artifacts of package type feature. See: https://issues.apache.org/jira/browse/MINSTALL-151 -->
+        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+
+        <!-- Override version for maven-deploy-plugin due to a bug similar to the maven-install-plugin -->
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+
+        <org.apache.felix.configadmin.plugin.interpolation.version>1.1.0
+        </org.apache.felix.configadmin.plugin.interpolation.version>
+        <org.apache.felix.configurator.version>1.0.10</org.apache.felix.configurator.version>
+        <org.apache.felix.converter.version>1.0.14</org.apache.felix.converter.version>
+        <jakarta.json.version>1.1.6</jakarta.json.version>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>${releases.repo.id}</id>
+            <url>${releases.repo.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>${snapshots.repo.id}</id>
+            <url>${snapshots.repo.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
+        <!--
+        Substitute placeholder values in ConfigAdmin configuration with values from the
+        file system, environment variables or system properties.
+        -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin.plugin.interpolation</artifactId>
+            <version>${org.apache.felix.configadmin.plugin.interpolation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configurator</artifactId>
+            <version>${org.apache.felix.configurator.version}</version>
+        </dependency>
+        <!--
+        Dependencies - Apache Felix Configurator - Will change in future versions.
+        Note: Dependencies of Configurator are defined with scope - provided.
+        Required dependencies need a dedicated declaration the current feature file;
+        otherwise dependencies would be collected through the Apache Karaf maven plugin.
+        -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.converter</artifactId>
+            <version>${org.apache.felix.converter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${jakarta.json.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.karaf.tooling</groupId>
+                    <artifactId>karaf-maven-plugin</artifactId>
+                    <version>${karaf-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <startLevel>40</startLevel>
+                        <aggregateFeatures>false</aggregateFeatures>
+                        <enableGeneration>true</enableGeneration>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>generate-features-file</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>features-generate-descriptor</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
